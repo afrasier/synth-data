@@ -18,6 +18,10 @@ class Command(BaseCommand):
         self.modes = {
             'given_name': mode_given_name,
             'family_name': mode_family_name,
+            'location': mode_location,
+            'street_suffix': mode_street_suffix,
+            'street_name': mode_street_name,
+            'secondary_designator': mode_secondary_designator
         }
 
     def add_arguments(self, parser):
@@ -77,6 +81,53 @@ def mode_family_name():
     # A map from CSV column headers model fields
     column_map = {
         "Name": "name",
+    }
+
+    return (model, column_map)
+
+
+def mode_location():
+    model = "synth_data.records.models.Location"
+
+    column_map = {
+        "Zipcode": "postal_code",
+        "ZipCodeType": "postal_code_type",
+        "City": "city",
+        "State": "state",
+        "Lat": "latitude",
+        "Long": "longitude",
+    }
+
+    return (model, column_map)
+
+
+def mode_street_suffix():
+    model = "synth_data.records.models.StreetSuffix"
+
+    column_map = {
+        "name": "name",
+        "Abbreviation": "abbreviation"
+    }
+
+    return (model, column_map)
+
+
+def mode_street_name():
+    model = "synth_data.records.models.StreetName"
+
+    column_map = {
+        "name": "name",
+    }
+
+    return (model, column_map)
+
+
+def mode_secondary_designator():
+    model = "synth_data.records.models.SecondaryAddressDesignator"
+
+    column_map = {
+        "Description": "name",
+        "Abbreviation": "abbreviation"
     }
 
     return (model, column_map)

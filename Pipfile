@@ -11,6 +11,9 @@ numpy = "*"
 pandas = "*"
 django-pandas = "*"
 django-extensions = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filters = "*"
 
 [dev-packages]
 django-debug-toolbar = "*"

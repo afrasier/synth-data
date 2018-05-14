@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
     # Third-party
     'django_extensions',
+    'rest_framework',
 
     # Application apps
     'synth_data.records',
