@@ -13,7 +13,7 @@ class GivenName(models.Model):
     name = models.CharField(max_length=120, help_text="The given name")
     sex = models.CharField(max_length=1, help_text="A flag indicating the general sex of the name")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -24,7 +24,7 @@ class FamilyName(models.Model):
 
     name = models.CharField(max_length=120, help_text="The family name")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -42,7 +42,7 @@ class Location(models.Model):
     latitude = models.FloatField(null=True, help_text="The latitude of the location")
     longitude = models.FloatField(null=True, help_text="The longitude of the location")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.city}, {self.state}"
 
 
@@ -54,7 +54,7 @@ class StreetSuffix(models.Model):
     name = models.CharField(max_length=120, help_text="The colloquial name for the suffix")
     abbreviation = models.CharField(max_length=12, help_text="The standard abbreviation for this suffix")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -65,7 +65,7 @@ class StreetName(models.Model):
 
     name = models.CharField(max_length=120, help_text="The street name")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -77,5 +77,5 @@ class SecondaryAddressDesignator(models.Model):
     name = models.CharField(max_length=120, help_text="The full name of the designator")
     abbreviation = models.CharField(max_length=12, help_text="The designator's abbreviation")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

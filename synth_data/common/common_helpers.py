@@ -1,4 +1,4 @@
-def format_seconds(seconds):
+def format_seconds(seconds: float) -> str:
     '''
     This function takes an argument, in seconds, and returns a formatted string representing that duration of time
     '''

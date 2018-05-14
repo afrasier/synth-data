@@ -14,9 +14,14 @@ django-extensions = "*"
 djangorestframework = "*"
 markdown = "*"
 django-filters = "*"
+"psycopg2" = "*"
+"psycopg2-binary" = "*"
 
 [dev-packages]
 django-debug-toolbar = "*"
+pytest = "*"
+pytest-django = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.6"
