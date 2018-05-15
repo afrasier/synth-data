@@ -14,7 +14,7 @@ class Job(models.Model):
         'rows': 1000,
         'columns': {
             'first_name': {
-                'data': 'givenname',
+                'factory': 'GivenNameFactory',
                 'options': {
                     'sex': 'male'
                 },
@@ -23,7 +23,7 @@ class Job(models.Model):
                 }
             },
             'tel_no': {
-                'data': 'telephone',
+                'factory': 'NumberFactory',
                 'options': {
                     'format': '(###) ###-####'
                 },

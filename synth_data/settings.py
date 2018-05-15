@@ -174,6 +174,9 @@ LOGGING = {
     }
 }
 
+SHELL_PLUS_PRE_IMPORTS = [
+    ('synth_data.records.factory.django', ('GivenNameFactory', 'LocationFactory', 'StreetNameFactory', 'StreetSuffixFactory', 'SecondaryAddressDesignatorFactory')),
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
