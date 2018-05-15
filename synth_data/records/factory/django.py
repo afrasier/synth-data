@@ -38,7 +38,7 @@ class DjangoModelFactory():
         else:
             self.options = Q()
 
-        if self.django_instance_count == 0:
+        if self.django_instance_count == 0:  # pragma: no cover
             self.logger.warning(f"There are no avaialble records for {self.DJANGO_MODEL}")
 
     def create_rows(self, count: int, columns: str = None) -> pandas.DataFrame:
@@ -53,7 +53,7 @@ class DjangoModelFactory():
 
         while dataframe.empty or dataframe.shape[0] < count:
             records = self.django_class.objects.all().filter(self.options).order_by('?').values(*columns)[:min(count - dataframe.shape[0], self.django_instance_count)]
-            if records.count() == 0:
+            if records.count() == 0:  # pragma: no cover
                 self.logger.warning(f"Could not find any records for {self.DJANGO_MODEL} with options {self.options}")
                 return dataframe
             df = read_frame(records)
