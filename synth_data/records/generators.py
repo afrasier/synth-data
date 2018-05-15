@@ -27,9 +27,22 @@ def number_generator(format: str = '###-###-####') -> Callable:
     return generator()
 
 
+def range_generator(start: int = 0, end: int = 10) -> Callable:
+    '''
+    Creates a generator which creates numbers in the specified range
+    '''
+    rand = random.SystemRandom()
+
+    def generator():
+        while True:
+            yield str(rand.randint(start, end))
+
+    return generator()
+
+
 def date_generator(range_start: str, range_end: str) -> Callable:
     '''
-    Creates a generator which generates dates within a given range (inclusive)
+    Creates a generator which generates date strings within a given range (inclusive)
     Ranges are specified as ISO strings
     '''
     rand = random.SystemRandom()

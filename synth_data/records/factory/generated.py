@@ -42,6 +42,11 @@ class NumberFactory(GeneratorFactory):
     GENERATOR = "synth_data.records.generators.number_generator"
 
 
+class NumberRangeFactory(GeneratorFactory):
+
+    GENERATOR = "synth_data.records.generators.range_generator"
+
+
 class DateFactory(GeneratorFactory):
 
     GENERATOR = "synth_data.records.generators.date_generator"

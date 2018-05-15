@@ -60,7 +60,9 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # Application apps
+    'synth_data.common',
     'synth_data.records',
+    'synth_data.jobs',
 ]
 
 MIDDLEWARE = [
@@ -177,6 +179,7 @@ LOGGING = {
 SHELL_PLUS_PRE_IMPORTS = [
     ('synth_data.records.factory.django', ('GivenNameFactory', 'LocationFactory', 'StreetNameFactory', 'StreetSuffixFactory', 'SecondaryAddressDesignatorFactory')),
     ('synth_data.records.factory.generated', ('NumberFactory', 'DateFactory')),
+    ('synth_data.records.factory.hybrid', ('StreetAddressFactory')),
 ]
 
 # Password validation

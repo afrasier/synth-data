@@ -16,8 +16,9 @@ class Job(models.Model):
             'first_name': {
                 'factory': 'GivenNameFactory',
                 'options': {
-                    'sex': 'male'
+                    'sex': 'M'
                 },
+                'use_column': 'name',
                 'mutators': {
                     'transposition': 0.1
                 }
