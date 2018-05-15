@@ -41,7 +41,7 @@ class DjangoModelFactory():
         if self.django_instance_count == 0:  # pragma: no cover
             self.logger.warning(f"There are no avaialble records for {self.DJANGO_MODEL}")
 
-    def create_rows(self, count: int, columns: str = None) -> pandas.DataFrame:
+    def create_rows(self, count: int, columns: list = None) -> pandas.DataFrame:
         '''
         Create a dataframe with the specified number of rows, and the requested columns,
         if no columns are specified, default columns will be returned

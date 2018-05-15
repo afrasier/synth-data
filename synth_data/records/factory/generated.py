@@ -1,23 +1,43 @@
-import pytest
+import pandas
+import logging
 
-from model_mommy import mommy
+from pydoc import locate
+from synth_data.records.generators import number_generator
 
-from synth_data.records.factory.django import GivenNameFactory, LocationFactory, StreetNameFactory, StreetSuffixFactory, SecondaryAddressDesignatorFactory
-
-test_factories = [
-    (GivenNameFactory),
-    (LocationFactory),
-    (StreetNameFactory),
-    (StreetSuffixFactory),
-    (SecondaryAddressDesignatorFactory),
-]
+'''
+This file contains factories which generate their data (rather than randomizing known records)
+'''
 
 
-@pytest.mark.parametrize("factory", test_factories)
-@pytest.mark.django_db()
-def test_django_factories(factory):
-    f = factory()
-    mommy.make(f.django_class, _quantity=10)
+class GeneratorFactory():
+    '''
+    This factory uses some generator to create and fill data into a dataframe
+    '''
 
-    assert f.create_rows(count=10).shape[0] == 10
-    assert f.create_rows(count=1000).shape[0] == 1000
+    MAX_BATCH_SIZE = 100000
+    GENERATOR = ""
+
+    def __init__(self, options: dict):
+        '''
+        Initialize the factory - options are passed to the generator as kwargs
+        '''
+        self.logger = logging.getLogger(__name__)
+        self.options = options
+
+        self.generator = locate(self.GENERATOR)(**options)
+
+    def create_rows(self, count: int, columns: list):
+        dataframe = pandas.DataFrame(columns=columns)
+
+        while dataframe.empty or dataframe.shape[0] < count:
+            # Create a list of lists of generator data for each column
+            dataframe_data = {col: [next(self.generator) for _ in range(0, min(count - dataframe.shape[0], self.MAX_BATCH_SIZE))] for col in columns}
+
+            dataframe = pandas.concat([dataframe, pandas.DataFrame(dataframe_data)], ignore_index=True)
+
+        return dataframe.truncate(after=count)
+
+
+class NumberFactory(GeneratorFactory):
+
+    GENERATOR = "synth_data.records.generators.number_generator"
