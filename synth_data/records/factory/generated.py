@@ -2,7 +2,6 @@ import pandas
 import logging
 
 from pydoc import locate
-from synth_data.records.generators import number_generator
 
 '''
 This file contains factories which generate their data (rather than randomizing known records)
@@ -41,3 +40,14 @@ class GeneratorFactory():
 class NumberFactory(GeneratorFactory):
 
     GENERATOR = "synth_data.records.generators.number_generator"
+
+
+class DateFactory(GeneratorFactory):
+
+    GENERATOR = "synth_data.records.generators.date_generator"
+
+    def create_rows(self, *args, **kwargs):
+        df = super(DateFactory, self).create_rows(*args, **kwargs)
+        # Conver the data to pandas datetimes
+        df[kwargs.get('columns')] = df[kwargs.get('columns')].apply(pandas.to_datetime)
+        return df

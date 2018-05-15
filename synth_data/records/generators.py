@@ -1,6 +1,9 @@
 import re
 import random
 
+from dateutil.parser import parse
+from datetime import timedelta
+
 from typing import Callable
 
 
@@ -20,5 +23,24 @@ def number_generator(format: str = '###-###-####') -> Callable:
     def generator():
         while True:
             yield re.sub('#', random_integer, format)
+
+    return generator()
+
+
+def date_generator(range_start: str, range_end: str) -> Callable:
+    '''
+    Creates a generator which generates dates within a given range (inclusive)
+    Ranges are specified as ISO strings
+    '''
+    rand = random.SystemRandom()
+
+    range_start = parse(range_start)
+    range_end = parse(range_end)
+
+    spread = (range_end - range_start).total_seconds()
+
+    def generator():
+        while True:
+            yield str(range_start + timedelta(seconds=rand.randint(0, spread)))
 
     return generator()
