@@ -31,14 +31,23 @@ def run_job(job_json: dict) -> dict:
         "StreetAddressFactory": "synth_data.records.factory.hybrid.StreetAddressFactory",
     }
 
+    mutator_classes = {
+        "mistyped": "synth_data.records.mutators.mistyped",
+        "misheard": "synth_data.records.mutators.misheard",
+        "misread": "synth_data.records.mutators.misread",
+    }
+
+    # Pull data from the json
     num_rows = job_json.get('rows')
     columns = job_json.get('columns')
     factories = job_json.get('factories')
+    mutators = job_json.get('mutators')
 
     logger.info(f"Sythesizing {num_rows} for columns {columns}")
 
     dataframe = pandas.DataFrame(columns=columns)
 
+    # Create our pure data
     for f in factories:
         factory = f.get('factory')
         options = f.get('options')
@@ -55,8 +64,24 @@ def run_job(job_json: dict) -> dict:
     pure_file = tempfile.NamedTemporaryFile(delete=False)
     dataframe.to_csv(pure_file.name, index_label="index")
 
+    logger.info(f"Pure data generated, mutating...")
+
+    # Mutate columns as specified
+    for column, col_mutators in mutators.items():
+        logger.info(f"Processing mutators for column {column}")
+
+        for mutator, probability in col_mutators.items():
+            logger.info(f"Applying {mutator} p={probability} to {column}")
+            m = locate(mutator_classes.get(mutator))(probability)
+
+            dataframe[column] = dataframe[column].map(m)
+
+    mutated_file = tempfile.NamedTemporaryFile(delete=False)
+    dataframe.to_csv(mutated_file.name, index_label="index")
+
     logger.info(f"Sythesis complete, elapsed time: {format_seconds((datetime.datetime.now() - start).total_seconds())}")
 
     return {
-        "pure_file": pure_file.name
+        "pure_file": pure_file.name,
+        "mutated_file": mutated_file.name
     }

@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         test_json = {
             # How many rows?
-            'rows': 100000,
+            'rows': 10,
             # What are the columns?
             'columns': [
                 'first_name',
@@ -81,7 +81,7 @@ class Command(BaseCommand):
                 {
                     'factory': 'StreetAddressFactory',
                     "column_map": {
-                        "address": "address"
+                        "name": "address"
                     }
                 },
                 {
@@ -99,60 +99,15 @@ class Command(BaseCommand):
                 # Dict of mutator/probability pairs for any/each column
                 'first_name': {
                     'mistyped': 0.15
+                },
+                'last_name': {
+                    'misread': 0.5,
+                    'misheard': 0.1
+                },
+                'address': {
+                    'mistyped': 0.25
                 }
             }
         }
-
-
-        # test_json = {
-        #     'rows': 100000,
-        #     'columns': {
-        #         'first_name': {
-        #             'factory': 'GivenNameFactory',
-        #             'options': {
-        #                 'sex': 'M'
-        #             },
-        #             'use_column': 'name',
-        #             'mutators': {
-        #                 'transposition': 0.1
-        #             }
-        #         },
-        #         'last_name': {
-        #             'factory': 'FamilyNameFactory',
-        #             'use_column': 'name',
-        #             'mutators': {
-        #                 'transposition': 0.1
-        #             }
-        #         },
-        #         'ssn': {
-        #             'factory': 'NumberFactory',
-        #             'options': {
-        #                 'format': '###-##-####'
-        #             },
-        #         },
-        #         'dob': {
-        #             'factory': 'DateFactory',
-        #             'options': {
-        #                 'range_start': '1975-01-01T00:00:00Z',
-        #                 'range_end': '2000-01-01T00:00:00Z',
-        #             },
-        #         },
-        #         'address': {
-        #             'factory': 'StreetAddressFactory',
-        #         },
-        #         'city': {
-        #             'factory': 'LocationFactory',
-        #             'use_column': 'city'
-        #         },
-        #         'state': {
-        #             'factory': 'LocationFactory',
-        #             'use_column': 'state'
-        #         },
-        #         'zip': {
-        #             'factory': 'LocationFactory',
-        #             'use_column': 'postal_code'
-        #         }
-        #     }
-        # }
 
         print(run_job(test_json))
