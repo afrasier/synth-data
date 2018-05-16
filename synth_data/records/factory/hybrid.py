@@ -28,6 +28,7 @@ class StreetAddressFactory():
             else:
                 return original_value
 
+        column = columns[0]
         street_names = self.street_name_factory.create_rows(count=count, columns=['name'])
         suffixes = self.street_suffix_factory.create_rows(count=count, columns=['abbreviation'])
         designators = self.sec_designator_factory.create_rows(count=count, columns=['abbreviation'])
@@ -40,5 +41,4 @@ class StreetAddressFactory():
         designators['abbreviation'] = designators['abbreviation'].map(lambda x: set_at_random(0.9, x, ""))
 
         street_names['name'] = street_numbers['street_no'].str.cat([street_names['name'], suffixes['abbreviation'], designators['abbreviation']], sep=' ')
-
-        return street_names
+        return street_names.rename(index=str, columns={'name': column})

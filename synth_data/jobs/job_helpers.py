@@ -34,26 +34,77 @@ def run_job(job_json: dict) -> dict:
     num_rows = job_json.get('rows')
     columns = job_json.get('columns')
 
-    logger.info(f"Sythesizing {num_rows} for columns {columns.keys()}")
+    logger.info(f"Processing job requirements...")
 
-    dataframe = pandas.DataFrame(columns=columns.keys())
+    '''
+    Parse our job to combine factories which should only be instantiated once (Record/Django factories)
+    {
+        "columns": [
+            ....
+        ],
+        "factories": [
+            {
+                "factory": "synth_databAADLFALSDFLASDF",
+                "column_map": {
+                    "use_column": "target_column"
+                },
+                "options": {
+                    "combinedoptions"
+                }
+            }
+        ]
+    }
+    '''
+
+    gathered_job = {
+        "columns": [],
+        "factories": []
+    }
 
     for column, specification in columns.items():
-        # TODO: Gather shared factories (like Location)
+        gathered_job["columns"].append(column)
+
         factory = specification.get('factory', None)
 
         if not factory:
             raise Exception(f"{column} has no specified factory.")
 
-        options = specification.get('options', None)
+        factory_object = {
+            "factory": factory,
+            "column_map": {},
+            "options": {}
+        }
+
+        if 'django' in factory:
+            existing_factory = [x for x in gathered_job['factories'] if x.factory == factory]
+            if len(existing_factory) == 1:
+                factory_object = existing_factory[0]
+            elif len(existing_factory) > 1:
+                logger.warning(f"Multiple factories for {factory} while running job.")
+
+        # Map columns
+        factory_object["column_map"][specification.get("use_column", column)] = column
+        # Combine options
+        factory_object["options"] = {**factory_object["options"], **specification.get('options', {})}
+
+        gathered_job["factories"].append(factory_object)
+
+    logger.info(f"Sythesizing {num_rows} for columns {gathered_job['columns']}")
+
+    dataframe = pandas.DataFrame(columns=gathered_job['columns'])
+
+    for f in gathered_job['factories']:
+        factory = f.get('factory')
+        options = f.get('options')
 
         factory = locate(factories[factory])(options=options)
 
-        use_column = specification.get('use_column', column)
+        column_map = f.get('column_map')
 
-        df_column = factory.create_rows(count=num_rows, columns=[use_column])
+        factory_output = factory.create_rows(count=num_rows, columns=list(column_map.keys()))
 
-        dataframe[column] = df_column
+        for df_col, target_col in column_map.items():
+            dataframe[target_col] = factory_output[df_col]
 
     pure_file = tempfile.NamedTemporaryFile(delete=False)
     dataframe.to_csv(pure_file.name)
