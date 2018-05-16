@@ -17,7 +17,7 @@ def run_job(job_json: dict) -> dict:
     start = datetime.datetime.now()
     logger = logging.getLogger(__name__)
 
-    factories = {
+    factory_classes = {
         "GivenNameFactory": "synth_data.records.factory.django.GivenNameFactory",
         "FamilyNameFactory": "synth_data.records.factory.django.FamilyNameFactory",
         "LocationFactory": "synth_data.records.factory.django.LocationFactory",
@@ -33,71 +33,17 @@ def run_job(job_json: dict) -> dict:
 
     num_rows = job_json.get('rows')
     columns = job_json.get('columns')
+    factories = job_json.get('factories')
 
-    logger.info(f"Processing job requirements...")
+    logger.info(f"Sythesizing {num_rows} for columns {columns}")
 
-    '''
-    Parse our job to combine factories which should only be instantiated once (Record/Django factories)
-    {
-        "columns": [
-            ....
-        ],
-        "factories": [
-            {
-                "factory": "synth_databAADLFALSDFLASDF",
-                "column_map": {
-                    "use_column": "target_column"
-                },
-                "options": {
-                    "combinedoptions"
-                }
-            }
-        ]
-    }
-    '''
+    dataframe = pandas.DataFrame(columns=columns)
 
-    gathered_job = {
-        "columns": [],
-        "factories": []
-    }
-
-    for column, specification in columns.items():
-        gathered_job["columns"].append(column)
-
-        factory = specification.get('factory', None)
-
-        if not factory:
-            raise Exception(f"{column} has no specified factory.")
-
-        factory_object = {
-            "factory": factory,
-            "column_map": {},
-            "options": {}
-        }
-
-        if 'django' in factory:
-            existing_factory = [x for x in gathered_job['factories'] if x.factory == factory]
-            if len(existing_factory) == 1:
-                factory_object = existing_factory[0]
-            elif len(existing_factory) > 1:
-                logger.warning(f"Multiple factories for {factory} while running job.")
-
-        # Map columns
-        factory_object["column_map"][specification.get("use_column", column)] = column
-        # Combine options
-        factory_object["options"] = {**factory_object["options"], **specification.get('options', {})}
-
-        gathered_job["factories"].append(factory_object)
-
-    logger.info(f"Sythesizing {num_rows} for columns {gathered_job['columns']}")
-
-    dataframe = pandas.DataFrame(columns=gathered_job['columns'])
-
-    for f in gathered_job['factories']:
+    for f in factories:
         factory = f.get('factory')
         options = f.get('options')
 
-        factory = locate(factories[factory])(options=options)
+        factory = locate(factory_classes[factory])(options=options)
 
         column_map = f.get('column_map')
 
@@ -107,7 +53,7 @@ def run_job(job_json: dict) -> dict:
             dataframe[target_col] = factory_output[df_col]
 
     pure_file = tempfile.NamedTemporaryFile(delete=False)
-    dataframe.to_csv(pure_file.name)
+    dataframe.to_csv(pure_file.name, index_label="index")
 
     logger.info(f"Sythesis complete, elapsed time: {format_seconds((datetime.datetime.now() - start).total_seconds())}")
 
